@@ -6,6 +6,9 @@ import { Debug } from './debug';
 export const Config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
+  dom: {
+    createContainer: true,
+  },
   width: 1080,
   height: 1920,
   fps: {

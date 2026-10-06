@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { Colors, FallAttrs, GameStates, Registry, Scenes, SpeedLineAttrs } from '../config';
+import { Colors, GameStates, Registry, Scenes, SpeedLineAttrs } from '../config';
+import { Tuning } from '../util/tuning';
 
 interface SpeedLine {
   line: Phaser.GameObjects.Rectangle;
@@ -21,7 +22,7 @@ export class BackgroundScene extends Phaser.Scene {
   public update(_time: number, delta: number): void {
     // Scroll lines upward: fast while falling, slowly on menus.
     const gameState = this.registry.get(Registry.GAME_STATE);
-    const speed = gameState === GameStates.STARTED ? FallAttrs.SPEED : SpeedLineAttrs.MENU_SPEED;
+    const speed = gameState === GameStates.STARTED ? Tuning.values.fallSpeed : SpeedLineAttrs.MENU_SPEED;
     const distance = (speed * delta) / 1000;
 
     this.speedLines.forEach(({ line, speedFactor }) => {

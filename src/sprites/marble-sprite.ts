@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, MarbleAttrs } from '../config';
+import { Tuning } from '../util/tuning';
 
 export class MarbleSprite extends Phaser.GameObjects.Arc {
   private targetX: number;
@@ -7,6 +8,7 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
   private maxX: number;
   private dragPointerId: number | null = null;
   private lastPointerX = 0;
+  private dropped = false;
 
   constructor(scene: Phaser.Scene) {
     // Start centered, just above the top of the screen.
@@ -31,17 +33,35 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
 
   public update(delta: number): void {
     // Follow the target position smoothly, independent of frame rate.
-    const follow = 1 - Math.exp(-delta / MarbleAttrs.DRAG.SMOOTHING);
+    const smoothing = Tuning.values.smoothing;
+    const follow = smoothing > 0 ? 1 - Math.exp(-delta / smoothing) : 1;
     this.x += (this.targetX - this.x) * follow;
+
+    // After dropping in, stay at the tuned height.
+    if (this.dropped) {
+      this.y = this.restingY();
+    }
+  }
+
+  public getHitbox(circle: Phaser.Geom.Circle): Phaser.Geom.Circle {
+    // Hitbox is slightly smaller than the drawn marble.
+    return circle.setTo(this.x, this.y, MarbleAttrs.RADIUS * MarbleAttrs.HITBOX_RATIO);
+  }
+
+  private restingY(): number {
+    return (Number(this.scene.game.config.height) * Tuning.values.marbleHeight) / 100;
   }
 
   private dropIn(): void {
-    // Drop in from the top and come to rest one third down the screen.
+    // Drop in from the top and come to rest at the tuned height.
     this.scene.tweens.add({
       targets: this,
-      y: Number(this.scene.game.config.height) * MarbleAttrs.Y_RATIO,
+      y: this.restingY(),
       duration: MarbleAttrs.DROP.DURATION,
       ease: MarbleAttrs.DROP.EASE,
+      onComplete: () => {
+        this.dropped = true;
+      },
     });
   }
 
@@ -63,7 +83,7 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
       }
       const deltaX = pointer.x - this.lastPointerX;
       this.lastPointerX = pointer.x;
-      this.targetX = Phaser.Math.Clamp(this.targetX + deltaX * MarbleAttrs.DRAG.SENSITIVITY, this.minX, this.maxX);
+      this.targetX = Phaser.Math.Clamp(this.targetX + deltaX * Tuning.values.sensitivity, this.minX, this.maxX);
     };
 
     // Lifting the finger leaves the marble where it is.

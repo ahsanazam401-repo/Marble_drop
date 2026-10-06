@@ -5,6 +5,7 @@ import { Config } from './config';
 import en from './locales/en.json';
 import es from './locales/es.json';
 import { Util } from './util';
+import { Tuning } from './util/tuning';
 
 let game: Phaser.Game;
 
@@ -17,6 +18,9 @@ let game: Phaser.Game;
 
   // Initialize locales.
   await initLocales();
+
+  // Load saved tuning settings.
+  await Tuning.load(game.registry);
 
   // Initialize events.
   initEvents();

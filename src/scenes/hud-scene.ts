@@ -13,6 +13,7 @@ import {
   Sounds,
   Textures,
 } from '../config';
+import { TuningPanel } from '../ui/tuning-panel';
 import { Util } from '../util';
 
 export class HudScene extends Phaser.Scene {
@@ -20,6 +21,8 @@ export class HudScene extends Phaser.Scene {
   private startGameText: Phaser.GameObjects.Text;
   private gameOverContainer: Phaser.GameObjects.Container;
   private escapeButton: Phaser.GameObjects.Image;
+  private depthText: Phaser.GameObjects.Text;
+  private tuningPanel: TuningPanel;
   private fpsText: Phaser.GameObjects.Text;
   private menuSelectSound: Phaser.Sound.BaseSound;
 
@@ -33,6 +36,12 @@ export class HudScene extends Phaser.Scene {
 
     // Add escape button.
     this.addEscapeButton();
+
+    // Add depth counter.
+    this.addDepth();
+
+    // Add tuning panel.
+    this.tuningPanel = new TuningPanel(this);
 
     // Add FPS.
     this.addFps();
@@ -55,6 +64,24 @@ export class HudScene extends Phaser.Scene {
       // Update FPS text.
       this.fpsText?.setText(`${__('FPS')}: ${Math.round(this.game.loop.actualFps)}`);
     }
+  }
+
+  private addDepth(): void {
+    // Add depth counter at the top center.
+    this.depthText = this.add
+      .text(Number(this.game.config.width) / 2, HudAttrs.DEPTH.Y, '0 m', {
+        ...Font(FontSizes.LARGE),
+        color: Colors.WHITE.HEX,
+        stroke: Colors.BLACK.HEX,
+        strokeThickness: 8,
+        align: 'center',
+      })
+      .setOrigin(0.5, 0);
+
+    // Update depth counter when the depth changes.
+    this.registry.events.on(`changedata-${Registry.DEPTH}`, (_parent: Phaser.Data.DataManager, depth: number) => {
+      this.depthText.setText(`${depth} m`);
+    });
   }
 
   private initSounds(): void {
@@ -92,6 +119,8 @@ export class HudScene extends Phaser.Scene {
     const gameState = this.registry.get(Registry.GAME_STATE);
     this.startGameContainer.setVisible(gameState === GameStates.MENU);
     this.escapeButton.setVisible(gameState === GameStates.STARTED);
+    this.depthText.setVisible(gameState === GameStates.STARTED);
+    this.tuningPanel.setVisible(gameState === GameStates.STARTED);
   }
 
   private addStartGameContainer(): void {
