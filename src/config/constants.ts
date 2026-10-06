@@ -39,10 +39,10 @@ export const FallAttrs = {
 export const ObstacleAttrs = {
   // Distance fallen between each new obstacle, in pixels.
   SPACING: 650,
-  HEIGHT: 60,
+  HEIGHT: 48,
   WIDTH: {
-    MIN: 200,
-    MAX: 520,
+    MIN: 160,
+    MAX: 416,
   },
   // Hitbox is this many pixels smaller than the drawn block on every side.
   HITBOX_INSET: 10,
