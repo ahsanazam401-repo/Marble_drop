@@ -52,7 +52,7 @@ Online leaderboards, ads, in-app purchases, multiplayer, story mode.
 Phaser 4 + TypeScript + Vite (from the phaser-typescript-template), Capacitor for the Android app later. Portrait, 9:16 play area. Progress saved on the device. Test builds will be published to GitHub Pages. Use the Phaser skills in this project.
 
 ## Task list
-0. Project setup (in progress)
+0. Project setup (done)
 1. Falling and drag control
 2. Obstacles and losing
 3. Moving and slowing obstacles
