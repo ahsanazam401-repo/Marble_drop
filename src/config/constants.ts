@@ -9,8 +9,8 @@ export const GameStates = {
 };
 
 export const MarbleAttrs = {
-  RADIUS: 50,
-  STROKE: 6,
+  RADIUS: 60,
+  STROKE: 7,
   // Resting height as a fraction of the screen height (one third from the top).
   Y_RATIO: 1 / 3,
   DROP: {
