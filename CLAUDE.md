@@ -55,7 +55,7 @@ Phaser 4 + TypeScript + Vite (from the phaser-typescript-template), Capacitor fo
 0. Project setup (done)
 1. Falling and drag control
 2. Obstacles and losing
-3. Moving and slowing obstacles
+3. Moving and slowing obstacles (each obstacle type is its own separate piece with its own size and speed, so speeds mix: e.g. block scrolls with the world, riser rises faster from below, crosser moves in from the sides. Grey placeholder blocks first; images later)
 4. Endless levels and speed (speed ramp must rise smoothly, no jumps. Proposed: start 900 px/s, 1000 px/s at 500 m, then +10% every 100 m, capped at 1800 px/s. Still to decide: +10% of current speed or fixed +100 px/s steps)
 5. Coins and power-ups
 6. Screens and flow
