@@ -11,19 +11,6 @@ export class SceneHandler extends Phaser.Scene {
   }
 
   public preload(): void {
-    // Load background images.
-    this.load.image(Textures.BACKGROUND.FAR.NAME, Textures.BACKGROUND.FAR.FILE);
-    this.load.image(Textures.BACKGROUND.NEAR.NAME, Textures.BACKGROUND.NEAR.FILE);
-
-    // Load ground image.
-    this.load.image(Textures.GROUND.NAME, Textures.GROUND.FILE);
-
-    // Load player sprite sheet.
-    this.load.spritesheet(Textures.PLAYER.NAME, Textures.PLAYER.FILE, {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-
     // Load HUD sprite sheet.
     this.load.spritesheet(Textures.HUD.NAME, Textures.HUD.FILE, {
       frameWidth: 16,
@@ -31,8 +18,6 @@ export class SceneHandler extends Phaser.Scene {
     });
 
     // Load sounds.
-    this.load.audio(Sounds.RUN.NAME, Sounds.RUN.FILE);
-    this.load.audio(Sounds.JUMP.NAME, Sounds.JUMP.FILE);
     this.load.audio(Sounds.MENU_SELECT.NAME, Sounds.MENU_SELECT.FILE);
     this.load.audio(Sounds.START_GAME.NAME, Sounds.START_GAME.FILE);
     this.load.audio(Sounds.GAME_OVER.NAME, Sounds.GAME_OVER.FILE);

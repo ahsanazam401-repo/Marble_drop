@@ -10,6 +10,7 @@ export const Colors = {
   BLUE: makeColor('#1976d2'),
   GREEN: makeColor('#388e3c'),
   LIGHT_BLUE: makeColor('#2fbdff'),
+  ORANGE: makeColor('#ff8f00'),
   RED: makeColor('#d32f2f'),
   WHITE: makeColor('#ffffff'),
 };

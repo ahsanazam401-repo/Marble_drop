@@ -1,63 +1,52 @@
 import Phaser from 'phaser';
-import { BackgroundAttrs, GameStates, Registry, Scenes, Textures } from '../config';
+import { Colors, FallAttrs, GameStates, Registry, Scenes, SpeedLineAttrs } from '../config';
+
+interface SpeedLine {
+  line: Phaser.GameObjects.Rectangle;
+  speedFactor: number;
+}
 
 export class BackgroundScene extends Phaser.Scene {
-  private backgroundFar: Phaser.GameObjects.TileSprite;
-  private backgroundNear: Phaser.GameObjects.TileSprite;
+  private speedLines: SpeedLine[] = [];
 
   constructor() {
     super(Scenes.BACKGROUND);
   }
 
   public create(): void {
-    // Add background.
-    this.addBackground();
+    // Add speed lines.
+    this.addSpeedLines();
   }
 
-  public update(): void {
+  public update(_time: number, delta: number): void {
+    // Scroll lines upward: fast while falling, slowly on menus.
     const gameState = this.registry.get(Registry.GAME_STATE);
-    if (gameState === GameStates.STARTED) {
-      // Move background based on camera movement.
-      const gameScene = this.scene.get('GameScene') as Phaser.Scene;
-      const camera = gameScene.cameras.main;
-      if (camera) {
-        this.backgroundFar.tilePositionX = camera.scrollX * BackgroundAttrs.FAR.SCROLL.GAME;
-        this.backgroundNear.tilePositionX = camera.scrollX * BackgroundAttrs.NEAR.SCROLL.GAME;
+    const speed = gameState === GameStates.STARTED ? FallAttrs.SPEED : SpeedLineAttrs.MENU_SPEED;
+    const distance = (speed * delta) / 1000;
+
+    this.speedLines.forEach(({ line, speedFactor }) => {
+      line.y -= distance * speedFactor;
+
+      // Move lines that left the top back below the bottom.
+      if (line.y + line.height < 0) {
+        this.placeLine(line, Number(this.game.config.height));
       }
-    } else {
-      // Scroll background on menu screen.
-      this.backgroundFar.tilePositionX += BackgroundAttrs.FAR.SCROLL.MENU;
-      this.backgroundNear.tilePositionX += BackgroundAttrs.NEAR.SCROLL.MENU;
+    });
+  }
+
+  private addSpeedLines(): void {
+    // Alternate between faint, slower far lines and brighter, faster near lines.
+    for (let i = 0; i < SpeedLineAttrs.COUNT; i++) {
+      const layer = i % 2 === 0 ? SpeedLineAttrs.FAR : SpeedLineAttrs.NEAR;
+      const line = this.add.rectangle(0, 0, layer.WIDTH, 1, Colors.WHITE.DECIMAL, layer.ALPHA).setOrigin(0.5, 0);
+      this.placeLine(line, Phaser.Math.Between(0, Number(this.game.config.height)));
+      this.speedLines.push({ line, speedFactor: layer.SPEED_FACTOR });
     }
   }
 
-  private addBackground(): void {
-    // Add far background.
-    const backgroundFar = this.textures.get(Textures.BACKGROUND.FAR.NAME).getSourceImage();
-    this.backgroundFar = this.add
-      .tileSprite(
-        0,
-        0,
-        Number(this.game.config.width) / BackgroundAttrs.FAR.SCALE,
-        backgroundFar.height,
-        Textures.BACKGROUND.FAR.NAME,
-      )
-      .setScrollFactor(0)
-      .setScale(BackgroundAttrs.FAR.SCALE)
-      .setOrigin(0);
-
-    // Add near background.
-    const backgroundNear = this.textures.get(Textures.BACKGROUND.NEAR.NAME).getSourceImage();
-    this.backgroundNear = this.add
-      .tileSprite(
-        0,
-        Number(this.game.config.height),
-        Number(this.game.config.width) / BackgroundAttrs.NEAR.SCALE,
-        backgroundNear.height,
-        Textures.BACKGROUND.NEAR.NAME,
-      )
-      .setScrollFactor(0)
-      .setScale(BackgroundAttrs.NEAR.SCALE)
-      .setOrigin(0, 1);
+  private placeLine(line: Phaser.GameObjects.Rectangle, y: number): void {
+    // Give the line a random length and horizontal position.
+    line.setSize(line.width, Phaser.Math.Between(SpeedLineAttrs.LENGTH.MIN, SpeedLineAttrs.LENGTH.MAX));
+    line.setPosition(Phaser.Math.Between(0, Number(this.game.config.width)), y);
   }
 }

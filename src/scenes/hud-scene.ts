@@ -1,8 +1,6 @@
 import i18n, { __ } from 'i18n-for-browser';
 import Phaser from 'phaser';
-import VirtualJoystick from 'phaser4-rex-plugins/plugins/virtualjoystick';
 import {
-  ActionButtonStates,
   Colors,
   Debug,
   Font,
@@ -21,8 +19,6 @@ export class HudScene extends Phaser.Scene {
   private startGameContainer: Phaser.GameObjects.Container;
   private startGameText: Phaser.GameObjects.Text;
   private gameOverContainer: Phaser.GameObjects.Container;
-  private joystick: VirtualJoystick;
-  private actionButton: Phaser.GameObjects.Image;
   private escapeButton: Phaser.GameObjects.Image;
   private fpsText: Phaser.GameObjects.Text;
   private menuSelectSound: Phaser.Sound.BaseSound;
@@ -34,12 +30,6 @@ export class HudScene extends Phaser.Scene {
   public create(): void {
     // Add start game container.
     this.addStartGameContainer();
-
-    // Add joystick.
-    this.addJoystick();
-
-    // Add action button.
-    this.addActionButton();
 
     // Add escape button.
     this.addEscapeButton();
@@ -101,8 +91,6 @@ export class HudScene extends Phaser.Scene {
     // Toggle HUD elements.
     const gameState = this.registry.get(Registry.GAME_STATE);
     this.startGameContainer.setVisible(gameState === GameStates.MENU);
-    this.joystick.setVisible(gameState === GameStates.STARTED);
-    this.actionButton.setVisible(gameState === GameStates.STARTED);
     this.escapeButton.setVisible(gameState === GameStates.STARTED);
   }
 
@@ -225,47 +213,6 @@ export class HudScene extends Phaser.Scene {
 
         // Play menu select sound.
         Util.playSound(this.menuSelectSound);
-      });
-  }
-
-  private addJoystick(): void {
-    // Add joystick.
-    this.joystick = new VirtualJoystick(this, {
-      x: HudAttrs.JOYSTICK.X,
-      y: Number(this.game.config.height) + HudAttrs.JOYSTICK.Y,
-      radius: HudAttrs.JOYSTICK.RADIUS,
-      dir: 'left&right',
-      base: this.add
-        .image(0, 0, Textures.HUD.NAME, Frames.HUD.JOYSTICK)
-        .setScale(HudAttrs.JOYSTICK.SCALE)
-        .setOrigin(0, 1),
-      thumb: this.add
-        .image(0, 0, Textures.HUD.NAME, Frames.HUD.JOYSTICK_THUMB)
-        .setScale(HudAttrs.JOYSTICK.SCALE)
-        .setOrigin(0, 1),
-    });
-    this.registry.set(Registry.JOYSTICK, this.joystick);
-  }
-
-  private addActionButton(): void {
-    // Add action button.
-    this.actionButton = this.add
-      .image(
-        Number(this.game.config.width) + HudAttrs.ACTION_BUTTON.X,
-        Number(this.game.config.height) + HudAttrs.ACTION_BUTTON.Y,
-        Textures.HUD.NAME,
-        Frames.HUD.ACTION_BUTTON,
-      )
-      .setScale(HudAttrs.ACTION_BUTTON.SCALE)
-      .setOrigin(1, 1)
-      .setInteractive()
-      .on('pointerdown', () => {
-        // Action button pressed.
-        this.registry.set(Registry.ACTION_BUTTON, ActionButtonStates.PRESSED);
-      })
-      .on('pointerup', () => {
-        // Action button released.
-        this.registry.set(Registry.ACTION_BUTTON, null);
       });
   }
 

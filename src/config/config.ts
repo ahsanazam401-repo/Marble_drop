@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import VirtualJoystickPlugin from 'phaser4-rex-plugins/plugins/virtualjoystick-plugin';
 import { BackgroundScene, GameScene, HudScene, SceneHandler } from '../scenes';
 import { Colors } from './colors';
 import { Debug } from './debug';
@@ -29,18 +28,9 @@ export const Config: Phaser.Types.Core.GameConfig = {
       debug: Debug.physics,
       gravity: {
         x: 0,
-        y: 2000,
+        y: 0,
       },
     },
-  },
-  plugins: {
-    global: [
-      {
-        key: 'rexVirtualJoystick',
-        plugin: VirtualJoystickPlugin,
-        start: true,
-      },
-    ],
   },
   scene: [SceneHandler, BackgroundScene, HudScene, GameScene],
 };
