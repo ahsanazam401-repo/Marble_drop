@@ -1,0 +1,2 @@
+# Keep LF line endings (required by the Prettier/ESLint pre-commit check)
+* text=auto eol=lf
