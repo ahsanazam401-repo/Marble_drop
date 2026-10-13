@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import { Colors, CrashAttrs, MarbleAttrs } from '../config';
+import { Colors, CrashAttrs, MarbleAttrs, Textures } from '../config';
 import { Tuning } from '../util/tuning';
 
-export class MarbleSprite extends Phaser.GameObjects.Arc {
+export class MarbleSprite extends Phaser.GameObjects.Image {
   private targetX: number;
   private minX: number;
   private maxX: number;
@@ -14,14 +14,16 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
   constructor(scene: Phaser.Scene) {
     // Start centered, just above the top of the screen.
     const x = Number(scene.game.config.width) / 2;
-    super(scene, x, -MarbleAttrs.RADIUS, MarbleAttrs.RADIUS, 0, 360, false, Colors.ORANGE.DECIMAL);
+    const art = Textures.HERO.FALLING;
+    super(scene, x, -MarbleAttrs.RADIUS, art.NAME);
 
-    // Initialize marble.
-    this.setStrokeStyle(MarbleAttrs.STROKE, Colors.BLACK.DECIMAL);
+    // Size the picture so the ball matches the marble radius, with the ball centre as the origin.
+    this.setScale(MarbleAttrs.RADIUS / (art.BALL.RADIUS * this.width));
+    this.setOrigin(art.BALL.X, art.BALL.Y);
     this.targetX = x;
 
-    // Keep the whole marble inside the screen edges.
-    const edge = MarbleAttrs.RADIUS + MarbleAttrs.STROKE / 2;
+    // Keep the whole ball inside the screen edges.
+    const edge = MarbleAttrs.RADIUS;
     this.minX = edge;
     this.maxX = Number(scene.game.config.width) - edge;
 
@@ -60,8 +62,8 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
 
     this.scene.tweens.add({
       targets: this,
-      scaleX: CrashAttrs.SQUASH.SCALE_X,
-      scaleY: CrashAttrs.SQUASH.SCALE_Y,
+      scaleX: this.scaleX * CrashAttrs.SQUASH.SCALE_X,
+      scaleY: this.scaleY * CrashAttrs.SQUASH.SCALE_Y,
       duration: CrashAttrs.SQUASH.DURATION,
       yoyo: true,
     });

@@ -48,7 +48,6 @@ export const ObstacleAttrs = {
   OFFSCREEN: 100,
   // Keep free-floating obstacles this far from the screen edges.
   EDGE_MARGIN: 10,
-  OUTLINE: 6,
   // Hitboxes are smaller than the drawings, so near misses feel fair.
   HITBOX: {
     RATIO: 0.85,
@@ -57,26 +56,16 @@ export const ObstacleAttrs = {
   },
   ROCK: {
     RADIUS: { MIN: 50, MAX: 90 },
-    // Outline points, each pushed in by up to this fraction for a lumpy shape.
-    POINTS: 10,
-    LUMPINESS: 0.18,
   },
   STICK: {
     LENGTH: { MIN: 220, MAX: 380 },
-    THICKNESS: { MIN: 30, MAX: 40 },
-    TWIG_LENGTH: { MIN: 50, MAX: 70 },
   },
   ICE_SPIKES: {
-    COUNT: { MIN: 2, MAX: 4 },
-    WIDTH: { MIN: 50, MAX: 70 },
-    HEIGHT: { MIN: 90, MAX: 150 },
-    BASE: 20,
+    HEIGHT: { MIN: 150, MAX: 220 },
   },
   PINE_TREE: {
     // Length grown out from the screen edge.
     LENGTH: { MIN: 300, MAX: 440 },
-    HEIGHT: { MIN: 130, MAX: 180 },
-    TRUNK: { LENGTH: 30, THICKNESS: 20 },
   },
 };
 
@@ -178,6 +167,11 @@ export const HudAttrs = {
       X: -250,
       Y: 476,
     },
+  },
+  HERO: {
+    // Width of the hero pictures above the start and game over boxes.
+    WIDTH: 560,
+    GAP: 10,
   },
   GAME_OVER: {
     HEIGHT: 700,

@@ -16,10 +16,9 @@ export const Config: Phaser.Types.Core.GameConfig = {
     forceSetTimeOut: true,
   },
   backgroundColor: Colors.LIGHT_BLUE.HEX,
-  pixelArt: true,
-  roundPixels: true,
+  // Smooth scaling for cartoon art; the small pixel-art HUD icons are kept sharp in SceneHandler.
   render: {
-    antialias: false,
+    antialias: true,
   },
   scale: {
     mode: Phaser.Scale.FIT,

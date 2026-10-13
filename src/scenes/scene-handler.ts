@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameStates, Registry, Scenes, Sounds, Textures } from '../config';
+import { GameStates, ObstacleArts, Registry, Scenes, Sounds, Textures } from '../config';
 import { Util } from '../util';
 
 export class SceneHandler extends Phaser.Scene {
@@ -17,6 +17,14 @@ export class SceneHandler extends Phaser.Scene {
       frameHeight: 16,
     });
 
+    // Load hero images.
+    Object.values(Textures.HERO).forEach((art) => this.load.image(art.NAME, art.FILE));
+
+    // Load obstacle images.
+    Object.values(ObstacleArts)
+      .flat()
+      .forEach((art) => this.load.image(art.NAME, art.FILE));
+
     // Load sounds.
     this.load.audio(Sounds.MENU_SELECT.NAME, Sounds.MENU_SELECT.FILE);
     this.load.audio(Sounds.START_GAME.NAME, Sounds.START_GAME.FILE);
@@ -24,6 +32,9 @@ export class SceneHandler extends Phaser.Scene {
   }
 
   public create(): void {
+    // Keep the pixel-art HUD icons sharp while everything else is smooth.
+    this.textures.get(Textures.HUD.NAME).setFilter(Phaser.Textures.FilterMode.NEAREST);
+
     // Start Background scene.
     this.scene.launch(Scenes.BACKGROUND);
 

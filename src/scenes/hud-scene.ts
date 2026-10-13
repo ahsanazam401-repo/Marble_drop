@@ -189,7 +189,7 @@ export class HudScene extends Phaser.Scene {
     this.startGameContainer = this.add.container(
       Number(this.game.config.width) / 2 - HudAttrs.CONTAINER.WIDTH / 2,
       Number(this.game.config.height) / 2 - HudAttrs.CONTAINER.HEIGHT / 2,
-      [rectangle, this.startGameText, enFlag, esFlag],
+      [this.addHero(Textures.HERO.MENU.NAME), rectangle, this.startGameText, enFlag, esFlag],
     );
   }
 
@@ -227,7 +227,9 @@ export class HudScene extends Phaser.Scene {
       Colors.BLACK.HEX,
     );
     const bestText = addLine(HudAttrs.GAME_OVER.BEST_Y, `${__('BEST')}: ${best} m`, FontSizes.SMALL, Colors.BLACK.HEX);
-    const items: Phaser.GameObjects.GameObject[] = [rectangle, gameOverText, depthText, bestText];
+    // Show the flying hero for a new best, otherwise the bandaged hero.
+    const hero = this.addHero(isNewBest ? Textures.HERO.FLYING.NAME : Textures.HERO.GAME_OVER.NAME);
+    const items: Phaser.GameObjects.GameObject[] = [hero, rectangle, gameOverText, depthText, bestText];
     if (isNewBest) {
       items.push(addLine(HudAttrs.GAME_OVER.NEW_BEST_Y, __('NEW BEST!'), FontSizes.MEDIUM, Colors.GREEN.HEX));
     } else if (Tuning.practice) {
@@ -279,6 +281,12 @@ export class HudScene extends Phaser.Scene {
       Number(this.game.config.height) / 2 - height / 2,
       items,
     );
+  }
+
+  private addHero(texture: string): Phaser.GameObjects.Image {
+    // Hero picture standing on top of a box (local container coordinates).
+    const hero = this.add.image(HudAttrs.CONTAINER.WIDTH / 2, -HudAttrs.HERO.GAP, texture).setOrigin(0.5, 1);
+    return hero.setScale(HudAttrs.HERO.WIDTH / hero.width);
   }
 
   private addLocaleImage(locale: string, frame: number, x: number, y: number): Phaser.GameObjects.Image {

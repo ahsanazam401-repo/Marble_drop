@@ -66,35 +66,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private addObstacle(): void {
-    // Pick a random mountain obstacle. Each one leaves room for the marble to pass.
-    const width = Number(this.game.config.width);
+    // Add a random mountain obstacle below the screen. Each one leaves room for the marble to pass.
     const y = Number(this.game.config.height) + ObstacleAttrs.OFFSCREEN;
-    const freeX = (halfWidth: number) =>
-      Phaser.Math.Between(halfWidth + ObstacleAttrs.EDGE_MARGIN, width - halfWidth - ObstacleAttrs.EDGE_MARGIN);
-
-    let obstacle: BaseObstacle;
-    switch (Phaser.Math.Between(0, 3)) {
-      case 0: {
-        const radius = Rock.randomRadius();
-        obstacle = new Rock(this, freeX(radius), y, radius);
-        break;
-      }
-      case 1: {
-        const length = Stick.randomLength();
-        obstacle = new Stick(this, freeX(length / 2), y, length);
-        break;
-      }
-      case 2: {
-        const spikes = IceSpikes.randomSpikes();
-        obstacle = new IceSpikes(this, freeX(IceSpikes.totalWidth(spikes) / 2), y, spikes);
-        break;
-      }
-      default: {
-        const fromLeft = Phaser.Math.RND.pick([true, false]);
-        obstacle = new PineTree(this, fromLeft ? 0 : width, y, PineTree.randomLength(), fromLeft ? 1 : -1);
-        break;
-      }
-    }
+    const Type = Phaser.Math.RND.pick([Rock, Stick, IceSpikes, PineTree]);
+    const obstacle = new Type(this, y);
 
     // Start fully below the screen.
     obstacle.y += obstacle.halfHeight;
