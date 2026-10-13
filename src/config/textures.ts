@@ -74,6 +74,16 @@ export const ObstacleArts: Record<'ROCKS' | 'STICKS' | 'ICE_SPIKES' | 'PINE_TREE
         { triangle: [0.703, 0.238, 0.703, 0.759, 1, 0.497] },
       ],
     },
+    {
+      NAME: 'pine-tree-2',
+      FILE: 'assets/images/obstacles/pine-tree-2.png',
+      HIT: [
+        { rect: [0, 0.392, 0.15, 0.215] },
+        { triangle: [0.188, 0.015, 0.188, 0.985, 0.6, 0.5] },
+        { triangle: [0.422, 0.096, 0.422, 0.898, 0.813, 0.5] },
+        { triangle: [0.672, 0.227, 0.672, 0.77, 1, 0.5] },
+      ],
+    },
   ],
 };
 
