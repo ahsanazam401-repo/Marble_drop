@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { Colors, GameStates, Registry, Scenes, SpeedLineAttrs } from '../config';
+import { Colors, GameStates, MountainAttrs, Registry, Scenes, SpeedLineAttrs } from '../config';
+import { MountainWalls } from '../scenery/mountain-walls';
 import { Tuning } from '../util/tuning';
 
 interface SpeedLine {
@@ -9,21 +10,38 @@ interface SpeedLine {
 
 export class BackgroundScene extends Phaser.Scene {
   private speedLines: SpeedLine[] = [];
+  private mountains: MountainWalls[] = [];
 
   constructor() {
     super(Scenes.BACKGROUND);
   }
 
   public create(): void {
-    // Add speed lines.
+    // Add mountain walls: a lighter far layer behind a darker near layer.
+    this.mountains = [
+      new MountainWalls(this, {
+        color: Colors.MOUNTAIN_FAR.DECIMAL,
+        width: MountainAttrs.FAR.WIDTH,
+        speedFactor: MountainAttrs.FAR.SPEED_FACTOR,
+      }),
+      new MountainWalls(this, {
+        color: Colors.MOUNTAIN_NEAR.DECIMAL,
+        width: MountainAttrs.NEAR.WIDTH,
+        speedFactor: MountainAttrs.NEAR.SPEED_FACTOR,
+      }),
+    ];
+
+    // Add speed lines in front.
     this.addSpeedLines();
   }
 
   public update(_time: number, delta: number): void {
-    // Scroll lines upward: fast while falling, slowly on menus.
+    // Scroll everything upward: fast while falling, slowly on menus.
     const gameState = this.registry.get(Registry.GAME_STATE);
     const speed = gameState === GameStates.STARTED ? Tuning.values.fallSpeed : SpeedLineAttrs.MENU_SPEED;
     const distance = (speed * delta) / 1000;
+
+    this.mountains.forEach((mountain) => mountain.update(distance));
 
     this.speedLines.forEach(({ line, speedFactor }) => {
       line.y -= distance * speedFactor;

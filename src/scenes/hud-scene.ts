@@ -15,6 +15,7 @@ import {
 } from '../config';
 import { TuningPanel } from '../ui/tuning-panel';
 import { Util } from '../util';
+import { Tuning } from '../util/tuning';
 
 export class HudScene extends Phaser.Scene {
   private startGameContainer: Phaser.GameObjects.Container;
@@ -64,6 +65,11 @@ export class HudScene extends Phaser.Scene {
   }
 
   public update(): void {
+    // Hit counter only matters in practice mode, where hits don't end the run.
+    this.hitsText.setVisible(
+      Debug.hitCounter && Tuning.practice && this.registry.get(Registry.GAME_STATE) === GameStates.STARTED,
+    );
+
     if (Debug.fps && this.fpsText?.visible) {
       // Update FPS text.
       this.fpsText?.setText(`${__('FPS')}: ${Math.round(this.game.loop.actualFps)}`);
@@ -144,7 +150,6 @@ export class HudScene extends Phaser.Scene {
     this.startGameContainer.setVisible(gameState === GameStates.MENU);
     this.escapeButton.setVisible(gameState === GameStates.STARTED);
     this.depthText.setVisible(gameState === GameStates.STARTED);
-    this.hitsText.setVisible(Debug.hitCounter && gameState === GameStates.STARTED);
     this.tuningPanel.setVisible(gameState === GameStates.STARTED);
   }
 
@@ -189,29 +194,54 @@ export class HudScene extends Phaser.Scene {
   }
 
   private addGameOverContainer(): void {
+    const width = HudAttrs.CONTAINER.WIDTH;
+    const height = HudAttrs.GAME_OVER.HEIGHT;
+
+    // Save a new best depth (practice runs don't count).
+    const depth = Number(this.registry.get(Registry.DEPTH)) || 0;
+    const previousBest = Number(this.registry.get(Registry.BEST_DEPTH)) || 0;
+    const isNewBest = !Tuning.practice && depth > previousBest;
+    if (isNewBest) {
+      Util.updateStorage(Registry.BEST_DEPTH, String(depth), this.registry);
+    }
+    const best = Math.max(depth, previousBest);
+
     // Add rectangle.
     const rectangle = this.add
-      .rectangle(0, 0, HudAttrs.CONTAINER.WIDTH, HudAttrs.CONTAINER.HEIGHT)
+      .rectangle(0, 0, width, height)
       .setFillStyle(Colors.WHITE.DECIMAL)
       .setStrokeStyle(HudAttrs.CONTAINER.STROKE, Colors.BLACK.DECIMAL)
       .setAlpha(HudAttrs.CONTAINER.ALPHA)
       .setOrigin(0);
 
-    // Add game over text.
-    const gameOverText = this.add.text(0, HudAttrs.GAME_OVER.Y, __('GAME OVER'), {
-      ...Font(FontSizes.LARGE),
-      color: Colors.BLUE.HEX,
-      align: 'center',
-      fixedWidth: HudAttrs.CONTAINER.WIDTH,
-    });
+    // Add a centred line of text.
+    const addLine = (y: number, text: string, fontSize: number, color: string) =>
+      this.add.text(0, y, text, { ...Font(fontSize), color, align: 'center', fixedWidth: width });
 
-    // Add retry text.
+    // Add game over, depth and best depth.
+    const gameOverText = addLine(HudAttrs.GAME_OVER.Y, __('GAME OVER'), FontSizes.LARGE, Colors.BLUE.HEX);
+    const depthText = addLine(
+      HudAttrs.GAME_OVER.DEPTH_Y,
+      `${__('DEPTH')}: ${depth} m`,
+      FontSizes.SMALL,
+      Colors.BLACK.HEX,
+    );
+    const bestText = addLine(HudAttrs.GAME_OVER.BEST_Y, `${__('BEST')}: ${best} m`, FontSizes.SMALL, Colors.BLACK.HEX);
+    const items: Phaser.GameObjects.GameObject[] = [rectangle, gameOverText, depthText, bestText];
+    if (isNewBest) {
+      items.push(addLine(HudAttrs.GAME_OVER.NEW_BEST_Y, __('NEW BEST!'), FontSizes.MEDIUM, Colors.GREEN.HEX));
+    } else if (Tuning.practice) {
+      items.push(addLine(HudAttrs.GAME_OVER.NEW_BEST_Y, __('PRACTICE'), FontSizes.SMALL, Colors.RED.HEX));
+    }
+
+    // Add a big retry button that restarts instantly.
     const retryText = this.add
-      .text(HudAttrs.RETRY.X, HudAttrs.RETRY.Y, __('RETRY'), {
-        ...Font(FontSizes.MEDIUM),
+      .text(width / 2, HudAttrs.RETRY.Y, __('RETRY'), {
+        ...Font(FontSizes.LARGE),
         color: Colors.GREEN.HEX,
         align: 'center',
       })
+      .setPadding(HudAttrs.RETRY.PADDING)
       .setOrigin(0.5, 1)
       .setInteractive()
       .on('pointerdown', () => {
@@ -224,8 +254,8 @@ export class HudScene extends Phaser.Scene {
 
     // Add quit text.
     const quitText = this.add
-      .text(HudAttrs.CONTAINER.WIDTH + HudAttrs.QUIT.X, HudAttrs.QUIT.Y, __('QUIT'), {
-        ...Font(FontSizes.MEDIUM),
+      .text(width / 2, HudAttrs.QUIT.Y, __('QUIT'), {
+        ...Font(FontSizes.SMALL),
         color: Colors.RED.HEX,
         align: 'center',
       })
@@ -241,12 +271,13 @@ export class HudScene extends Phaser.Scene {
         // Play menu select sound.
         Util.playSound(this.menuSelectSound);
       });
+    items.push(retryText, quitText);
 
     // Add container to scene.
     this.gameOverContainer = this.add.container(
-      Number(this.game.config.width) / 2 - HudAttrs.CONTAINER.WIDTH / 2,
-      Number(this.game.config.height) / 2 - HudAttrs.CONTAINER.HEIGHT / 2,
-      [rectangle, gameOverText, retryText, quitText],
+      Number(this.game.config.width) / 2 - width / 2,
+      Number(this.game.config.height) / 2 - height / 2,
+      items,
     );
   }
 

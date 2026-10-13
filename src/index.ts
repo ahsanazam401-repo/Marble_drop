@@ -1,7 +1,7 @@
 import { App } from '@capacitor/app';
 import i18n from 'i18n-for-browser';
 import Phaser from 'phaser';
-import { Config } from './config';
+import { Config, Registry } from './config';
 import en from './locales/en.json';
 import es from './locales/es.json';
 import { Util } from './util';
@@ -19,8 +19,9 @@ let game: Phaser.Game;
   // Initialize locales.
   await initLocales();
 
-  // Load saved tuning settings.
+  // Load saved tuning settings and best depth.
   await Tuning.load(game.registry);
+  await Util.getStorage(Registry.BEST_DEPTH, game.registry);
 
   // Initialize events.
   initEvents();

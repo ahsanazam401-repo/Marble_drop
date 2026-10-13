@@ -3,6 +3,8 @@ import { FallAttrs, MarbleAttrs, TuningAttrs } from '../config';
 import { TuningValues } from '../interfaces';
 import { Util } from './index';
 
+const PRACTICE_KEY = 'practice-mode';
+
 // Built on first use, because config is still loading when this file is imported.
 const getDefaults = (): TuningValues => ({
   fallSpeed: FallAttrs.SPEED,
@@ -14,6 +16,9 @@ const getDefaults = (): TuningValues => ({
 export class Tuning {
   private static current: TuningValues | null = null;
 
+  // Practice mode: obstacles only turn red instead of ending the run.
+  public static practice = false;
+
   // Current values, read every frame by the game.
   public static get values(): TuningValues {
     if (!this.current) {
@@ -23,6 +28,9 @@ export class Tuning {
   }
 
   public static async load(registry: Phaser.Data.DataManager): Promise<void> {
+    // Load practice mode.
+    this.practice = (await Util.getStorage(PRACTICE_KEY, registry)) === 'true';
+
     // Load saved values, ignoring anything missing or out of range.
     const stored = await Util.getStorage(TuningAttrs.STORAGE_KEY, registry);
     if (!stored) {
@@ -44,6 +52,12 @@ export class Tuning {
   public static set(key: keyof TuningValues, value: number): void {
     // Apply a value immediately.
     this.values[key] = value;
+  }
+
+  public static setPractice(practice: boolean, registry: Phaser.Data.DataManager): void {
+    // Apply and save practice mode.
+    this.practice = practice;
+    Util.updateStorage(PRACTICE_KEY, String(practice), registry);
   }
 
   public static save(registry: Phaser.Data.DataManager): void {

@@ -1,7 +1,11 @@
 {
+  "BEST": "BEST",
+  "DEPTH": "DEPTH",
   "FPS": "FPS",
   "GAME OVER": "GAME OVER",
   "HITS": "HITS",
+  "NEW BEST!": "NEW BEST!",
+  "PRACTICE": "PRACTICE",
   "QUIT": "QUIT",
   "RETRY": "RETRY",
   "START GAME": "START GAME"

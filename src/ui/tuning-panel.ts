@@ -55,6 +55,18 @@ const STYLES = `
   border-radius: 50%;
   background: #1976d2;
 }
+.tuning-practice {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 36px;
+  font-weight: bold;
+}
+.tuning-practice input {
+  width: 60px;
+  height: 60px;
+  margin: 0;
+}
 .tuning-actions {
   display: flex;
   justify-content: space-between;
@@ -68,6 +80,7 @@ export class TuningPanel {
   private scene: Phaser.Scene;
   private button: Phaser.GameObjects.DOMElement;
   private panel: Phaser.GameObjects.DOMElement;
+  private practiceInput: HTMLInputElement;
   private rows = new Map<keyof TuningValues, { input: HTMLInputElement; value: HTMLElement }>();
 
   constructor(scene: Phaser.Scene) {
@@ -108,6 +121,18 @@ export class TuningPanel {
     const panel = document.createElement('div');
     panel.className = 'tuning-panel';
     STOPPED_EVENTS.forEach((type) => panel.addEventListener(type, (event) => event.stopPropagation()));
+
+    // Add practice mode switch: obstacles only turn red instead of ending the run.
+    const practiceLabel = document.createElement('label');
+    practiceLabel.className = 'tuning-practice';
+    this.practiceInput = document.createElement('input');
+    this.practiceInput.type = 'checkbox';
+    this.practiceInput.addEventListener('change', () => {
+      Tuning.setPractice(this.practiceInput.checked, this.scene.registry);
+      this.scene.registry.set(Registry.HITS, 0);
+    });
+    practiceLabel.append(this.practiceInput, 'Practice mode (no crashing)');
+    panel.append(practiceLabel);
 
     // Add one slider per tuning value.
     TuningAttrs.SLIDERS.forEach((slider) => {
@@ -173,7 +198,8 @@ export class TuningPanel {
   }
 
   private refresh(): void {
-    // Show current values on the sliders and labels.
+    // Show current values on the switch, sliders and labels.
+    this.practiceInput.checked = Tuning.practice;
     TuningAttrs.SLIDERS.forEach((slider) => {
       const row = this.rows.get(slider.KEY);
       if (row) {

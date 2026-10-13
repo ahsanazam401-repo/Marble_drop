@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Colors, MarbleAttrs } from '../config';
+import { Colors, CrashAttrs, MarbleAttrs } from '../config';
 import { Tuning } from '../util/tuning';
 
 export class MarbleSprite extends Phaser.GameObjects.Arc {
@@ -9,6 +9,7 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
   private dragPointerId: number | null = null;
   private lastPointerX = 0;
   private dropped = false;
+  private crashed = false;
 
   constructor(scene: Phaser.Scene) {
     // Start centered, just above the top of the screen.
@@ -32,6 +33,10 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
   }
 
   public update(delta: number): void {
+    if (this.crashed) {
+      return;
+    }
+
     // Follow the target position smoothly, independent of frame rate.
     const smoothing = Tuning.values.smoothing;
     const follow = smoothing > 0 ? 1 - Math.exp(-delta / smoothing) : 1;
@@ -46,6 +51,53 @@ export class MarbleSprite extends Phaser.GameObjects.Arc {
   public getHitbox(circle: Phaser.Geom.Circle): Phaser.Geom.Circle {
     // Hitbox is slightly smaller than the drawn marble.
     return circle.setTo(this.x, this.y, MarbleAttrs.RADIUS * MarbleAttrs.HITBOX_RATIO);
+  }
+
+  public crash(): void {
+    // Stop steering and play the crash: squash, dizzy stars, then tumble away.
+    this.crashed = true;
+    this.scene.tweens.killTweensOf(this);
+
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: CrashAttrs.SQUASH.SCALE_X,
+      scaleY: CrashAttrs.SQUASH.SCALE_Y,
+      duration: CrashAttrs.SQUASH.DURATION,
+      yoyo: true,
+    });
+
+    const stars = Array.from({ length: CrashAttrs.STARS.COUNT }, () =>
+      this.scene.add
+        .star(this.x, this.y, 5, CrashAttrs.STARS.SIZE / 2, CrashAttrs.STARS.SIZE, Colors.YELLOW.DECIMAL)
+        .setStrokeStyle(4, Colors.BLACK.DECIMAL),
+    );
+    const orbit = { angle: 0 };
+    this.scene.tweens.add({
+      targets: orbit,
+      angle: Math.PI * 2,
+      duration: CrashAttrs.STARS.SPIN,
+      repeat: -1,
+      onUpdate: () => {
+        stars.forEach((star, i) => {
+          const angle = orbit.angle + (i * Math.PI * 2) / stars.length;
+          star.setPosition(
+            this.x + Math.cos(angle) * CrashAttrs.STARS.ORBIT,
+            this.y - MarbleAttrs.RADIUS + Math.sin(angle) * CrashAttrs.STARS.ORBIT * 0.4,
+          );
+          star.setAlpha(this.alpha);
+        });
+      },
+    });
+
+    this.scene.tweens.add({
+      targets: this,
+      y: this.y + CrashAttrs.TUMBLE.DISTANCE,
+      angle: CrashAttrs.TUMBLE.ANGLE,
+      alpha: 0,
+      delay: CrashAttrs.TUMBLE.DELAY,
+      duration: CrashAttrs.TUMBLE.DURATION,
+      ease: 'Quad.easeIn',
+    });
   }
 
   private restingY(): number {
