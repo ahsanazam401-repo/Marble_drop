@@ -12,8 +12,8 @@ export const GameStates = {
 };
 
 export const MarbleAttrs = {
-  RADIUS: 60,
-  STROKE: 7,
+  RADIUS: 72,
+  STROKE: 8,
   // Hitbox radius as a fraction of the drawn radius, so near misses feel fair.
   HITBOX_RATIO: 0.85,
   // Resting height as a fraction of the screen height (one third from the top).
