@@ -3,6 +3,7 @@ import { TuningValues } from '../interfaces';
 export const Registry = {
   GAME_STATE: 'game-state',
   DEPTH: 'depth',
+  HITS: 'hits',
 };
 
 export const GameStates = {
@@ -102,6 +103,9 @@ export const HudAttrs = {
   },
   DEPTH: {
     Y: 30,
+  },
+  HITS: {
+    Y: 110,
   },
   TUNE_BUTTON: {
     X: -30,

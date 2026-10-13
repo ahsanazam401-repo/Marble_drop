@@ -10,6 +10,7 @@ export class GameScene extends Phaser.Scene {
   private nextObstacleAt: number;
   private marbleHitbox = new Phaser.Geom.Circle();
   private obstacleHitbox = new Phaser.Geom.Rectangle();
+  private hitObstacles = new WeakSet<Phaser.GameObjects.Rectangle>();
 
   constructor() {
     super(Scenes.GAME);
@@ -54,6 +55,7 @@ export class GameScene extends Phaser.Scene {
     this.distance = 0;
     this.nextObstacleAt = 0;
     this.registry.set(Registry.DEPTH, 0);
+    this.registry.set(Registry.HITS, 0);
 
     // Add marble.
     this.marble = new MarbleSprite(this);
@@ -90,6 +92,12 @@ export class GameScene extends Phaser.Scene {
       );
       const touching = Phaser.Geom.Intersects.CircleToRectangle(marbleHitbox, this.obstacleHitbox);
       obstacle.setFillStyle(touching ? Colors.RED.DECIMAL : Colors.GREY.DECIMAL);
+
+      // Count each obstacle only once, on first touch.
+      if (touching && !this.hitObstacles.has(obstacle)) {
+        this.hitObstacles.add(obstacle);
+        this.registry.inc(Registry.HITS, 1);
+      }
 
       return true;
     });

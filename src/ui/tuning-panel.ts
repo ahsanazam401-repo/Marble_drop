@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { HudAttrs, TuningAttrs } from '../config';
+import { HudAttrs, Registry, TuningAttrs } from '../config';
 import { TuningValues } from '../interfaces';
 import { Tuning } from '../util/tuning';
 
@@ -128,6 +128,8 @@ export class TuningPanel {
       // Apply while dragging; save when released.
       input.addEventListener('input', () => {
         Tuning.set(slider.KEY, Number(input.value));
+        // Restart the hit count so it only measures the new settings.
+        this.scene.registry.set(Registry.HITS, 0);
         this.refresh();
       });
       input.addEventListener('change', () => Tuning.save(this.scene.registry));
@@ -142,6 +144,7 @@ export class TuningPanel {
     actions.append(
       this.createButton('Reset', () => {
         Tuning.reset(this.scene.registry);
+        this.scene.registry.set(Registry.HITS, 0);
         this.refresh();
       }),
       this.createButton('Close', () => this.panel.setVisible(false)),

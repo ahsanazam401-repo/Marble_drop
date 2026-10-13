@@ -22,6 +22,7 @@ export class HudScene extends Phaser.Scene {
   private gameOverContainer: Phaser.GameObjects.Container;
   private escapeButton: Phaser.GameObjects.Image;
   private depthText: Phaser.GameObjects.Text;
+  private hitsText: Phaser.GameObjects.Text;
   private tuningPanel: TuningPanel;
   private fpsText: Phaser.GameObjects.Text;
   private menuSelectSound: Phaser.Sound.BaseSound;
@@ -39,6 +40,9 @@ export class HudScene extends Phaser.Scene {
 
     // Add depth counter.
     this.addDepth();
+
+    // Add hit counter.
+    this.addHits();
 
     // Add tuning panel.
     this.tuningPanel = new TuningPanel(this);
@@ -84,6 +88,26 @@ export class HudScene extends Phaser.Scene {
     });
   }
 
+  private addHits(): void {
+    // Add temporary hit counter under the depth counter.
+    this.hitsText = this.add
+      .text(Number(this.game.config.width) / 2, HudAttrs.HITS.Y, `${__('HITS')}: 0`, {
+        ...Font(FontSizes.SMALL),
+        color: Colors.WHITE.HEX,
+        stroke: Colors.BLACK.HEX,
+        strokeThickness: 6,
+        align: 'center',
+      })
+      .setOrigin(0.5, 0);
+
+    // Update hit counter when the count changes.
+    const updateHits = (_parent: Phaser.Data.DataManager, hits: number) => {
+      this.hitsText.setText(`${__('HITS')}: ${hits}`);
+    };
+    this.registry.events.on(`setdata-${Registry.HITS}`, updateHits);
+    this.registry.events.on(`changedata-${Registry.HITS}`, updateHits);
+  }
+
   private initSounds(): void {
     // Initialize sounds.
     this.menuSelectSound = this.sound.add(Sounds.MENU_SELECT.NAME);
@@ -120,6 +144,7 @@ export class HudScene extends Phaser.Scene {
     this.startGameContainer.setVisible(gameState === GameStates.MENU);
     this.escapeButton.setVisible(gameState === GameStates.STARTED);
     this.depthText.setVisible(gameState === GameStates.STARTED);
+    this.hitsText.setVisible(Debug.hitCounter && gameState === GameStates.STARTED);
     this.tuningPanel.setVisible(gameState === GameStates.STARTED);
   }
 
