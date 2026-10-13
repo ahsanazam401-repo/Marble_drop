@@ -53,10 +53,10 @@ Phaser 4 + TypeScript + Vite (from the phaser-typescript-template), Capacitor fo
 
 ## Task list
 0. Project setup (done)
-1. Falling and drag control
+1. Falling and drag control (done)
 2. Obstacles and losing
 3. Moving and slowing obstacles (each obstacle type is its own separate piece with its own size and speed, so speeds mix: e.g. block scrolls with the world, riser rises faster from below, crosser moves in from the sides. Grey placeholder blocks first; images later)
-4. Endless levels and speed (speed ramp must rise smoothly, no jumps. Proposed: start 900 px/s, 1000 px/s at 500 m, then +10% every 100 m, capped at 1800 px/s. Still to decide: +10% of current speed or fixed +100 px/s steps)
+4. Endless levels and speed (speed ramp must rise smoothly, no jumps. Start speed is now 1000 px/s (chosen in Task 1). Earlier proposal: 1000 px/s at 500 m, then +10% every 100 m, capped at 1800 px/s; needs re-planning from the new start. Still to decide: +10% of current speed or fixed +100 px/s steps. Ahsan's test at sensitivity 1.6, hits per 500 m: 1250 px/s = 1, 1750 = 7, 1800 = 10, 2000 = 20+)
 5. Coins and power-ups
 6. Screens and flow
 7. Sceneries and store
@@ -64,8 +64,9 @@ Phaser 4 + TypeScript + Vite (from the phaser-typescript-template), Capacitor fo
 9. Playtesting and tuning
 10. App packaging and publishing
 
-## Task 1 plan (approved, not built yet)
+## Task 1 (done)
 Goal: steering feels precise and comfortable.
 Includes: hero as a plain circle fixed one third from the top; world scrolling up; relative drag control; scrolling background lines to show speed; depth counter in metres; a few placeholder obstacles that only flash when touched (no death); a tuning panel to adjust fall speed, drag sensitivity and smoothness while playing. Remove the template's demo game content (fox) but keep the project structure.
 Not included: death, coins, power-ups, art, sceneries, sound, menus.
 Done when: Ahsan plays it on his phone, steering feels precise, and he picks his preferred settings.
+Chosen settings (now the defaults): fall speed 1000 px/s, drag sensitivity 1.6, smoothness 60 ms, marble height 33% from top. Marble radius 72 (locked). Obstacles 20% smaller than first version. A temporary hit counter (Debug.hitCounter) helps tuning.

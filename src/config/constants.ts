@@ -25,7 +25,7 @@ export const MarbleAttrs = {
   },
   DRAG: {
     // Marble moves this many pixels for each pixel the thumb moves.
-    SENSITIVITY: 1,
+    SENSITIVITY: 1.6,
     // Follow delay in milliseconds. Higher values feel smoother but slower.
     SMOOTHING: 60,
   },
@@ -33,7 +33,7 @@ export const MarbleAttrs = {
 
 export const FallAttrs = {
   // Speed the world scrolls upward past the marble, in pixels per second.
-  SPEED: 900,
+  SPEED: 1000,
   PIXELS_PER_METRE: 100,
 };
 
