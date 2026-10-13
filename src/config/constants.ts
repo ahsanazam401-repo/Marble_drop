@@ -57,6 +57,9 @@ export const ObstacleAttrs = {
   },
   ROCK: {
     RADIUS: { MIN: 50, MAX: 90 },
+    // Outline points, each pushed in by up to this fraction for a lumpy shape.
+    POINTS: 10,
+    LUMPINESS: 0.18,
   },
   STICK: {
     LENGTH: { MIN: 220, MAX: 380 },
@@ -73,7 +76,7 @@ export const ObstacleAttrs = {
     // Length grown out from the screen edge.
     LENGTH: { MIN: 300, MAX: 440 },
     HEIGHT: { MIN: 130, MAX: 180 },
-    TRUNK: { LENGTH: 70, THICKNESS: 26 },
+    TRUNK: { LENGTH: 30, THICKNESS: 20 },
   },
 };
 

@@ -11,12 +11,15 @@ export class Rock extends BaseObstacle {
     super(scene, x, y);
     this.halfHeight = radius;
 
-    // Round boulder with a light highlight and a few darker spots.
+    // Lumpy boulder with a light highlight and a few darker spots.
+    const { POINTS, LUMPINESS } = ObstacleAttrs.ROCK;
+    const distances = Array.from({ length: POINTS }, () => radius * Phaser.Math.FloatBetween(1 - LUMPINESS, 1));
     this.parts.push({
-      kind: 'circle',
-      x: 0,
-      y: 0,
-      radius,
+      kind: 'polygon',
+      points: distances.map((distance, i) => {
+        const angle = (i / POINTS) * Math.PI * 2 + Phaser.Math.FloatBetween(-0.15, 0.15);
+        return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance };
+      }),
       fill: Colors.ROCK.DECIMAL,
       outline: Colors.ROCK_OUTLINE.DECIMAL,
     });
@@ -40,7 +43,9 @@ export class Rock extends BaseObstacle {
       });
     }
 
-    this.hitShapes.push(new Phaser.Geom.Circle(0, 0, radius * ObstacleAttrs.HITBOX.RATIO));
+    // Hitbox circle stays inside the lumps.
+    const averageDistance = distances.reduce((sum, distance) => sum + distance, 0) / POINTS;
+    this.hitShapes.push(new Phaser.Geom.Circle(0, 0, averageDistance * ObstacleAttrs.HITBOX.RATIO));
     this.redraw();
   }
 }
