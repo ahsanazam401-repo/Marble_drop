@@ -58,10 +58,12 @@ export const ObstacleAttrs = {
     RADIUS: { MIN: 50, MAX: 90 },
   },
   STICK: {
-    LENGTH: { MIN: 220, MAX: 380 },
+    LENGTH: { MIN: 260, MAX: 420 },
+    // Stretch the thin branch picture this much taller so it reads as thicker.
+    THICKNESS_SCALE: 1.5,
   },
   ICE_SPIKES: {
-    HEIGHT: { MIN: 150, MAX: 220 },
+    HEIGHT: { MIN: 210, MAX: 290 },
   },
   PINE_TREE: {
     // Length grown out from the screen edge.

@@ -9,10 +9,19 @@ export abstract class BaseObstacle extends Phaser.GameObjects.Image {
   private hitShapes: HitShape[] = [];
   private localCircle = new Phaser.Geom.Circle();
 
-  // Shows the art at the given width; flipX mirrors it (and its hitbox) left to right.
-  constructor(scene: Phaser.Scene, x: number, y: number, art: ObstacleArt, width: number, flipX = false) {
+  // Shows the art at the given width (heightScale stretches it taller); flipX mirrors it and its hitbox.
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    art: ObstacleArt,
+    width: number,
+    flipX = false,
+    heightScale = 1,
+  ) {
     super(scene, x, y, art.NAME);
-    this.setScale(width / this.width);
+    const scale = width / this.width;
+    this.setScale(scale, scale * heightScale);
     this.setFlipX(flipX);
     this.halfHeight = this.displayHeight / 2;
     this.buildHitShapes(art, flipX);
