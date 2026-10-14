@@ -73,13 +73,15 @@ export const ObstacleAttrs = {
 
 export const WobbleAttrs = {
   // How long a slowing obstacle (stick) makes the marble wobble, in milliseconds.
-  DURATION: 1000,
-  // Steering strength while wobbling (0.4 = the marble moves 40% as far as the thumb).
-  STEERING: 0.4,
+  DURATION: 1500,
+  // Steering strength while wobbling (0.25 = the marble moves 25% as far as the thumb).
+  STEERING: 0.25,
   // Extra follow delay while wobbling, in milliseconds.
-  EXTRA_DELAY: 80,
+  EXTRA_DELAY: 120,
+  // The marble is knocked this far sideways, away from the obstacle.
+  DEFLECTION: 160,
   // Side-to-side tilt in degrees, and time for one full rock left and right.
-  ANGLE: 18,
+  ANGLE: 25,
   PERIOD: 250,
   // Full wobble for the first part, then steering eases back to normal.
   FULL_PART: 0.5,

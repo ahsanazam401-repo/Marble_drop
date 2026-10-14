@@ -98,9 +98,10 @@ export class GameScene extends Phaser.Scene {
 
       const touching = obstacle.hits(marbleHitbox);
       if (touching && obstacle.slows) {
-        // Slowing obstacle: the marble wobbles and the obstacle snaps away.
-        this.marble.wobble();
-        obstacle.knockAway(Math.sign(obstacle.x - this.marble.x) || 1);
+        // Slowing obstacle: marble and obstacle bounce apart, and the marble wobbles.
+        const away = Math.sign(this.marble.x - obstacle.x) || Phaser.Math.RND.sign();
+        this.marble.wobble(away);
+        obstacle.knockAway(-away);
         if (Tuning.practice) {
           this.registry.inc(Registry.HITS, 1);
         }

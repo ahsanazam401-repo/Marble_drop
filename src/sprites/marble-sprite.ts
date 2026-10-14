@@ -61,8 +61,9 @@ export class MarbleSprite extends Phaser.GameObjects.Image {
     return circle.setTo(this.x, this.y, MarbleAttrs.RADIUS * MarbleAttrs.HITBOX_RATIO);
   }
 
-  public wobble(): void {
-    // Start (or restart) a short wobble with weaker steering.
+  public wobble(direction: number): void {
+    // Get knocked sideways (direction -1 = left, 1 = right) and start (or restart) a wobble with weaker steering.
+    this.targetX = Phaser.Math.Clamp(this.targetX + direction * WobbleAttrs.DEFLECTION, this.minX, this.maxX);
     this.wobbleEnd = this.scene.time.now + WobbleAttrs.DURATION;
   }
 
