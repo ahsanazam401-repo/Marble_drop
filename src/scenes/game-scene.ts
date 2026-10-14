@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { CrashAttrs, FallAttrs, GameStates, ObstacleAttrs, Registry, Scenes } from '../config';
-import { BaseObstacle, IceSpikes, PineTree, Rock, Stick } from '../obstacles';
+import { Colors, CrashAttrs, FallAttrs, Font, FontSizes, GameStates, ObstacleAttrs, Registry, Scenes } from '../config';
+import { BaseObstacle, IceSpikes, PineTree, Rock, Snowball, Stick } from '../obstacles';
 import { MarbleSprite } from '../sprites';
 import { Tuning } from '../util/tuning';
 
@@ -48,7 +48,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Move obstacles and check for hits.
-    this.updateObstacles(scroll);
+    this.updateObstacles(scroll, delta);
   }
 
   private startGame(): void {
@@ -66,6 +66,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private addObstacle(): void {
+    // Sometimes send a rising snowball instead (not in the first part of a run).
+    const { SNOWBALL } = ObstacleAttrs;
+    if (this.distance >= SNOWBALL.MIN_DISTANCE && Math.random() < SNOWBALL.CHANCE) {
+      this.warnSnowball();
+      return;
+    }
+
     // Add a random mountain obstacle below the screen. Each one leaves room for the marble to pass.
     const y = Number(this.game.config.height) + ObstacleAttrs.OFFSCREEN;
     const Type = Phaser.Math.RND.pick([Rock, Stick, IceSpikes, PineTree]);
@@ -76,7 +83,31 @@ export class GameScene extends Phaser.Scene {
     this.obstacles.push(obstacle);
   }
 
-  private updateObstacles(scroll: number): void {
+  private warnSnowball(): void {
+    // Show a blinking warning where the snowball will come from, then launch it.
+    const { WARNING } = ObstacleAttrs.SNOWBALL;
+    const radius = Snowball.randomRadius();
+    const x = BaseObstacle.freeX(this, Snowball.swirlMargin(radius));
+    const height = Number(this.game.config.height);
+
+    const sign = this.add.container(x, height - WARNING.Y, [
+      this.add.circle(0, 0, WARNING.RADIUS, Colors.RED.DECIMAL).setStrokeStyle(6, Colors.WHITE.DECIMAL),
+      this.add.text(0, 0, '!', { ...Font(FontSizes.LARGE), color: Colors.WHITE.HEX }).setOrigin(0.5),
+    ]);
+    this.tweens.add({ targets: sign, alpha: 0.3, duration: WARNING.BLINK, yoyo: true, repeat: -1 });
+
+    this.time.delayedCall(WARNING.TIME, () => {
+      sign.destroy();
+      if (this.crashed) {
+        return;
+      }
+      const snowball = new Snowball(this, x, height + ObstacleAttrs.OFFSCREEN, radius);
+      snowball.y += snowball.halfHeight;
+      this.obstacles.push(snowball);
+    });
+  }
+
+  private updateObstacles(scroll: number, delta: number): void {
     const marbleHitbox = this.marble.getHitbox(this.marbleHitbox);
 
     this.obstacles = this.obstacles.filter((obstacle) => {
@@ -84,7 +115,7 @@ export class GameScene extends Phaser.Scene {
       if (!obstacle.active) {
         return false;
       }
-      obstacle.y -= scroll;
+      obstacle.move({ scroll, delta });
 
       // Remove obstacles that left the top of the screen.
       if (obstacle.y < -obstacle.halfHeight - ObstacleAttrs.OFFSCREEN) {

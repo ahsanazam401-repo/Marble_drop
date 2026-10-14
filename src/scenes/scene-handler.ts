@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameStates, ObstacleArts, Registry, Scenes, Sounds, Textures } from '../config';
+import { Colors, GameStates, ObstacleArts, Registry, Scenes, Sounds, Textures } from '../config';
 import { Util } from '../util';
 
 export class SceneHandler extends Phaser.Scene {
@@ -32,6 +32,13 @@ export class SceneHandler extends Phaser.Scene {
   }
 
   public create(): void {
+    // Draw the soft snow puff used by snowball trails.
+    const puff = this.add.graphics();
+    const size = Textures.SNOW_PUFF.SIZE;
+    puff.fillStyle(Colors.WHITE.DECIMAL).fillCircle(size / 2, size / 2, size / 2);
+    puff.generateTexture(Textures.SNOW_PUFF.NAME, size, size);
+    puff.destroy();
+
     // Keep the pixel-art HUD icons sharp while everything else is smooth.
     this.textures.get(Textures.HUD.NAME).setFilter(Phaser.Textures.FilterMode.NEAREST);
 

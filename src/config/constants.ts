@@ -69,6 +69,20 @@ export const ObstacleAttrs = {
     // Length grown out from the screen edge.
     LENGTH: { MIN: 300, MAX: 440 },
   },
+  SNOWBALL: {
+    RADIUS: { MIN: 55, MAX: 75 },
+    // Rises this much faster than the world scrolls, in pixels per second.
+    RISE_SPEED: 600,
+    // Gentle loop left and right while rising, and spin in degrees per second.
+    SWIRL: { RADIUS: 70, PERIOD: 900 },
+    SPIN: 360,
+    // Share of obstacles that are snowballs, and distance fallen before the first one.
+    CHANCE: 0.2,
+    MIN_DISTANCE: 3000,
+    // A warning sign appears at the bottom edge this long before the snowball.
+    WARNING: { TIME: 700, Y: 90, RADIUS: 42, BLINK: 120 },
+    TRAIL: { LIFESPAN: 350, FREQUENCY: 30, SPEED: 300, SPREAD: 40, SCALE: 0.35, ALPHA: 0.8 },
+  },
 };
 
 export const WobbleAttrs = {

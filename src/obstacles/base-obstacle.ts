@@ -52,6 +52,12 @@ export abstract class BaseObstacle extends Phaser.GameObjects.Image {
     });
   }
 
+  // One frame of movement: scroll is how far the world moved, delta the frame time in milliseconds.
+  public move(step: { scroll: number; delta: number }): void {
+    // Most obstacles just scroll up with the world.
+    this.y -= step.scroll;
+  }
+
   public knockAway(direction: number): void {
     // Snap out of the way: spin off to the side and fade, then disappear.
     this.knocked = true;

@@ -27,10 +27,12 @@ export const Textures = {
     GAME_OVER: { NAME: 'hero-game-over', FILE: 'assets/images/hero/hero-game-over.png' },
     FLYING: { NAME: 'hero-flying', FILE: 'assets/images/hero/hero-flying.png' },
   },
+  // Drawn in code at startup, used for the snowball trail.
+  SNOW_PUFF: { NAME: 'snow-puff', SIZE: 32 },
 };
 
 // Obstacle images and their hitbox shapes, measured from each picture.
-export const ObstacleArts: Record<'ROCKS' | 'STICKS' | 'ICE_SPIKES' | 'PINE_TREES', ObstacleArt[]> = {
+export const ObstacleArts: Record<'ROCKS' | 'STICKS' | 'ICE_SPIKES' | 'PINE_TREES' | 'SNOWBALLS', ObstacleArt[]> = {
   ROCKS: [
     { NAME: 'rock-1', FILE: 'assets/images/obstacles/rock-1.png', HIT: [{ circle: [0.5, 0.518, 0.487] }] },
     { NAME: 'rock-2', FILE: 'assets/images/obstacles/rock-2.png', HIT: [{ circle: [0.49, 0.524, 0.466] }] },
@@ -84,6 +86,10 @@ export const ObstacleArts: Record<'ROCKS' | 'STICKS' | 'ICE_SPIKES' | 'PINE_TREE
         { triangle: [0.672, 0.227, 0.672, 0.77, 1, 0.5] },
       ],
     },
+  ],
+  SNOWBALLS: [
+    { NAME: 'snowball-1', FILE: 'assets/images/obstacles/snowball-1.png', HIT: [{ circle: [0.5, 0.5, 0.47] }] },
+    { NAME: 'snowball-2', FILE: 'assets/images/obstacles/snowball-2.png', HIT: [{ circle: [0.5, 0.5, 0.47] }] },
   ],
 };
 
