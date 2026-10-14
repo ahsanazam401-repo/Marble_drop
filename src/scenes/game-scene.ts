@@ -80,6 +80,10 @@ export class GameScene extends Phaser.Scene {
     const marbleHitbox = this.marble.getHitbox(this.marbleHitbox);
 
     this.obstacles = this.obstacles.filter((obstacle) => {
+      // Forget obstacles that finished being knocked away.
+      if (!obstacle.active) {
+        return false;
+      }
       obstacle.y -= scroll;
 
       // Remove obstacles that left the top of the screen.
@@ -88,11 +92,22 @@ export class GameScene extends Phaser.Scene {
         return false;
       }
 
+      if (obstacle.knocked || this.crashed) {
+        return true;
+      }
+
       const touching = obstacle.hits(marbleHitbox);
-      if (touching && !Tuning.practice && !this.crashed) {
+      if (touching && obstacle.slows) {
+        // Slowing obstacle: the marble wobbles and the obstacle snaps away.
+        this.marble.wobble();
+        obstacle.knockAway(Math.sign(obstacle.x - this.marble.x) || 1);
+        if (Tuning.practice) {
+          this.registry.inc(Registry.HITS, 1);
+        }
+      } else if (touching && !Tuning.practice) {
         // A hit ends the run.
         this.crash();
-      } else if (!this.crashed) {
+      } else {
         // Practice mode: turn red and count each obstacle once.
         obstacle.setTouching(touching);
         if (touching && !this.hitObstacles.has(obstacle)) {

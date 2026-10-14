@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
-import { Colors, ObstacleArt, ObstacleAttrs } from '../config';
+import { Colors, KnockAttrs, ObstacleArt, ObstacleAttrs } from '../config';
 
 type HitShape = Phaser.Geom.Circle | Phaser.Geom.Rectangle | Phaser.Geom.Triangle;
 
 export abstract class BaseObstacle extends Phaser.GameObjects.Image {
   // Half of the drawn height, used to spawn and remove obstacles off screen.
   public halfHeight: number;
+  // Slowing obstacles make the marble wobble instead of crashing.
+  public slows = false;
+  // Set once knocked away; it no longer collides.
+  public knocked = false;
   private hitShapes: HitShape[] = [];
   private localCircle = new Phaser.Geom.Circle();
 
@@ -45,6 +49,20 @@ export abstract class BaseObstacle extends Phaser.GameObjects.Image {
         return Phaser.Geom.Intersects.CircleToRectangle(local, shape);
       }
       return Phaser.Geom.Intersects.TriangleToCircle(shape, local);
+    });
+  }
+
+  public knockAway(direction: number): void {
+    // Snap out of the way: spin off to the side and fade, then disappear.
+    this.knocked = true;
+    this.scene.tweens.add({
+      targets: this,
+      x: this.x + direction * KnockAttrs.DISTANCE,
+      angle: direction * KnockAttrs.ANGLE,
+      alpha: 0,
+      duration: KnockAttrs.DURATION,
+      ease: 'Quad.easeOut',
+      onComplete: () => this.destroy(),
     });
   }
 

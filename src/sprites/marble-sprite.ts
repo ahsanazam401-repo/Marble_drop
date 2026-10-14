@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Colors, CrashAttrs, MarbleAttrs, Textures } from '../config';
+import { Colors, CrashAttrs, MarbleAttrs, Textures, WobbleAttrs } from '../config';
 import { Tuning } from '../util/tuning';
 
 export class MarbleSprite extends Phaser.GameObjects.Image {
@@ -10,6 +10,7 @@ export class MarbleSprite extends Phaser.GameObjects.Image {
   private lastPointerX = 0;
   private dropped = false;
   private crashed = false;
+  private wobbleEnd = 0;
 
   constructor(scene: Phaser.Scene) {
     // Start centered, just above the top of the screen.
@@ -39,10 +40,15 @@ export class MarbleSprite extends Phaser.GameObjects.Image {
       return;
     }
 
-    // Follow the target position smoothly, independent of frame rate.
-    const smoothing = Tuning.values.smoothing;
+    // Follow the target position smoothly, independent of frame rate (slower while wobbling).
+    const weakness = this.wobbleWeakness();
+    const smoothing = Tuning.values.smoothing + WobbleAttrs.EXTRA_DELAY * weakness;
     const follow = smoothing > 0 ? 1 - Math.exp(-delta / smoothing) : 1;
     this.x += (this.targetX - this.x) * follow;
+
+    // Rock side to side while wobbling.
+    const phase = (this.scene.time.now / WobbleAttrs.PERIOD) * Math.PI * 2;
+    this.angle = Math.sin(phase) * WobbleAttrs.ANGLE * weakness;
 
     // After dropping in, stay at the tuned height.
     if (this.dropped) {
@@ -53,6 +59,20 @@ export class MarbleSprite extends Phaser.GameObjects.Image {
   public getHitbox(circle: Phaser.Geom.Circle): Phaser.Geom.Circle {
     // Hitbox is slightly smaller than the drawn marble.
     return circle.setTo(this.x, this.y, MarbleAttrs.RADIUS * MarbleAttrs.HITBOX_RATIO);
+  }
+
+  public wobble(): void {
+    // Start (or restart) a short wobble with weaker steering.
+    this.wobbleEnd = this.scene.time.now + WobbleAttrs.DURATION;
+  }
+
+  private wobbleWeakness(): number {
+    // 1 = full wobble, easing to 0 (normal) over the second part of the wobble.
+    const remaining = (this.wobbleEnd - this.scene.time.now) / WobbleAttrs.DURATION;
+    if (remaining <= 0) {
+      return 0;
+    }
+    return Math.min(1, remaining / (1 - WobbleAttrs.FULL_PART));
   }
 
   public crash(): void {
@@ -137,7 +157,12 @@ export class MarbleSprite extends Phaser.GameObjects.Image {
       }
       const deltaX = pointer.x - this.lastPointerX;
       this.lastPointerX = pointer.x;
-      this.targetX = Phaser.Math.Clamp(this.targetX + deltaX * Tuning.values.sensitivity, this.minX, this.maxX);
+      const steering = 1 - (1 - WobbleAttrs.STEERING) * this.wobbleWeakness();
+      this.targetX = Phaser.Math.Clamp(
+        this.targetX + deltaX * Tuning.values.sensitivity * steering,
+        this.minX,
+        this.maxX,
+      );
     };
 
     // Lifting the finger leaves the marble where it is.

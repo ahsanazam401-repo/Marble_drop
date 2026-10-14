@@ -10,5 +10,8 @@ export class Stick extends BaseObstacle {
     const x = BaseObstacle.freeX(scene, length / 2);
     const flipX = Phaser.Math.RND.pick([true, false]);
     super(scene, x, y, Phaser.Math.RND.pick(ObstacleArts.STICKS), length, flipX, THICKNESS_SCALE);
+
+    // Sticks only make the marble wobble.
+    this.slows = true;
   }
 }
