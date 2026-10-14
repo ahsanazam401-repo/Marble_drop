@@ -55,7 +55,7 @@ Phaser 4 + TypeScript + Vite (from the phaser-typescript-template), Capacitor fo
 0. Project setup (done)
 1. Falling and drag control (done)
 2. Obstacles and losing (done)
-3. Moving and slowing obstacles (each obstacle type is its own separate piece with its own size and speed, so speeds mix: e.g. block scrolls with the world, riser rises faster from below, crosser moves in from the sides. Mountain obstacle pictures already exist from Task 2; new moving types can use placeholders until their art is made)
+3. Moving and slowing obstacles (each obstacle type is its own separate piece with its own size and speed, so speeds mix: e.g. block scrolls with the world, riser rises faster from below, crosser moves in from the sides. Mountain obstacle pictures already exist from Task 2; new moving types can use placeholders until their art is made. Done so far: sticks are a slowing obstacle; touching one knocks the marble about 160 px sideways away from it and makes it wobble for 1.28 s with 36% steering and a 21 degree side-to-side tilt, while the stick spins away. Ahsan approved the feel. Still to do: crossers from the sides and risers from below)
 4. Endless levels and speed (speed ramp must rise smoothly, no jumps. Start speed is now 1000 px/s (chosen in Task 1). Earlier proposal: 1000 px/s at 500 m, then +10% every 100 m, capped at 1800 px/s; needs re-planning from the new start. Still to decide: +10% of current speed or fixed +100 px/s steps. Ahsan's test at sensitivity 1.6, hits per 500 m: 1250 px/s = 1, 1750 = 7, 1800 = 10, 2000 = 20+)
 5. Coins and power-ups
 6. Screens and flow
